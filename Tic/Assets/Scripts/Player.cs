@@ -51,7 +51,7 @@ public class Player : MonoBehaviour
         transform.position = GameManager.Instance.PlaceOnGrid(transform.position);
         startPos = transform.position;
         
-        maxLife = startLife + Data.instance.extraTime;
+        maxLife = startLife + GameData.instance.extraTime;
         life = maxLife;
 
         RestartPlayer();

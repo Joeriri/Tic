@@ -4,20 +4,20 @@ using UnityEngine;
 
 // Source: https://answers.unity.com/questions/1224993/how-to-save-variables-between-scenes.html
 
-public class Data
+public class GameData
 {
     // keep constructor private
-    private Data()
+    private GameData()
     {
     }
 
-    static private Data _instance;
-    static public Data instance
+    static private GameData _instance;
+    static public GameData instance
     {
         get
         {
             if (_instance == null)
-                _instance = new Data();
+                _instance = new GameData();
             return _instance;
         }
     }

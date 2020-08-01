@@ -26,10 +26,10 @@ public class Settings : MonoBehaviour
     private void Awake()
     {
         // update audio slider
-        audioSlider.value = Data.instance.audioVolumeSetting * audioSlider.maxValue;
+        audioSlider.value = GameData.instance.audioVolumeSetting * audioSlider.maxValue;
         ChangeAudioVolume();
         // update extra time slider
-        addedTimeSlider.value = Data.instance.extraTimeSetting * addedTimeSlider.maxValue;
+        addedTimeSlider.value = GameData.instance.extraTimeSetting * addedTimeSlider.maxValue;
         ChangeAddedTime();
 
         kb = InputSystem.GetDevice<Keyboard>();
@@ -46,8 +46,8 @@ public class Settings : MonoBehaviour
     public void ChangeAddedTime()
     {
         float newValue = (addedTimeSlider.value / addedTimeSlider.maxValue) * maxAddedTime;
-        Data.instance.extraTime = newValue;
-        Data.instance.extraTimeSetting = addedTimeSlider.value / addedTimeSlider.maxValue;
+        GameData.instance.extraTime = newValue;
+        GameData.instance.extraTimeSetting = addedTimeSlider.value / addedTimeSlider.maxValue;
 
         int seconds = Mathf.FloorToInt(newValue);
         int tenths = Mathf.FloorToInt(newValue * 10f) % 10;
@@ -57,7 +57,7 @@ public class Settings : MonoBehaviour
     public void ChangeAudioVolume()
     {
         audioMixer.SetFloat("MasterVol", ConvertToDecibel(audioSlider.value / audioSlider.maxValue));
-        Data.instance.audioVolumeSetting = audioSlider.value / audioSlider.maxValue;
+        GameData.instance.audioVolumeSetting = audioSlider.value / audioSlider.maxValue;
 
         audioText.text = audioSlider.value.ToString("00");
     }
