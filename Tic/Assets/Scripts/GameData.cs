@@ -25,4 +25,6 @@ public class GameData
     public float extraTime;
     public float extraTimeSetting = 0.0f;
     public float audioVolumeSetting = 1.0f;
+    public int levelToLoad = 7;
+    public int currentWorld = 1;
 }

@@ -32,4 +32,11 @@ public class GameManager : MonoBehaviour
     {
         return (Vector2)tileGrid.CellToWorld(tileGrid.WorldToCell(position)) + new Vector2(tileGrid.cellSize.x * 0.5f, tileGrid.cellSize.y * 0.5f);
     }
+
+    public void GoToLevel(int world, int level)
+    {
+        GameData.instance.currentWorld = world;
+        GameData.instance.levelToLoad = level;
+        SceneManager.LoadScene("Test Level 2");
+    }
 }
