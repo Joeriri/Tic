@@ -8,6 +8,7 @@ using UnityEngine.Tilemaps;
 public class LevelLoader : MonoBehaviour
 {
     [Header("Level Objects")]
+    public Tilemap groundMap;
     public Tilemap wallMap;
     public RuleTile wallTile;
     public GameObject playerPrefab;
@@ -16,6 +17,10 @@ public class LevelLoader : MonoBehaviour
     [Header("Level Information")]
     [SerializeField] private Vector2Int levelSize = new Vector2Int(9,9);
     [SerializeField] private Vector2Int levelOrigin = new Vector2Int(-5, -5);
+
+    [Header("World Colors")]
+    public Material[] wallMaterials;
+    public Material[] floorMaterials;
 
     private void Awake()
     {
@@ -66,6 +71,10 @@ public class LevelLoader : MonoBehaviour
             }
 
         }
+
+        // assign materials
+        groundMap.GetComponent<TilemapRenderer>().material = floorMaterials[worldNumber - 1];
+        wallMap.GetComponent<TilemapRenderer>().material = wallMaterials[worldNumber - 1];
 
         Debug.Log("Loaded World " + worldNumber.ToString() + " Level " + levelNumber.ToString() + ".");
     }

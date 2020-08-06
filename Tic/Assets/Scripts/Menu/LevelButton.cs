@@ -22,6 +22,6 @@ public class LevelButton : MonoBehaviour
     // called via NavItem
     void OnConfirm()
     {
-        GameManager.Instance.GoToLevel(worldNumber, levelNumber);
+        NavManager.Instance.GoToLevel(worldNumber, levelNumber);
     }
 }

@@ -2,49 +2,56 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class NavManager : MonoBehaviour
 {
-    public GameObject levelSelect;
-    public NavItem activeNavItem;
-    public float camSwipeDuration = 1.0f;
+    public NavItem currentNavItem;
+    public Room currentRoom;
 
-    [Header("Camera-influenced NavItems")]
+    [Header("Scene Transition")]
+    public Transition transition;
+
+    [Header("Camera")]
+    public float camSwipeDuration = 1.0f;
+    public float camSwipeNavDisableDuration = 0.5f;
+    public AnimationCurve camSwipeCurve;
+
+    [Header("Room NavItems")]
     public NavItem settingsNavItem;
     public NavItem titleNavItem;
     public NavItem[] worldNavItems;
 
-    [Header("Camera Positions")]
-    public Transform settingsPos;
-    public Transform titlePos;
-    public Transform levelSelectPos;
+    [Header("Rooms")]
+    public Room titleRoom;
+    public Room settingsRoom;
+    public Room[] worldRooms;
 
     [Header("World Selection")]
     public int roomWidth = 23;
     public int roomPadding = 3;
-    public AnimationCurve worldSelectSwipeCurve;
-
-    private bool canNavigate = true;
+    public WorldRecolorer worldRrecolorer;
+    
+    bool canNavigate = true;
+    bool swipingCamera = false;
+    Coroutine camSwipeRoutine;
 
     Keyboard kb;
     CameraMovement camMovement;
 
+    public static NavManager Instance;
+
     private void Awake()
     {
+        Instance = this;
+
         kb = InputSystem.GetDevice<Keyboard>();
         camMovement = Camera.main.GetComponent<CameraMovement>();
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        StartCoroutine(TransitionIn());
     }
 
     #region Input
@@ -52,107 +59,152 @@ public class NavManager : MonoBehaviour
     void OnLeft()
     {
         if (canNavigate)
-            activeNavItem.leftEvent.Invoke();
+            currentNavItem.leftEvent.Invoke();
     }
 
     void OnRight()
     {
         if (canNavigate)
-            activeNavItem.rightEvent.Invoke();
+            currentNavItem.rightEvent.Invoke();
     }
 
     void OnUp()
     {
         if (canNavigate)
-            activeNavItem.upEvent.Invoke();
+            currentNavItem.upEvent.Invoke();
     }
 
     void OnDown()
     {
         if (canNavigate)
-            activeNavItem.downEvent.Invoke();
+            currentNavItem.downEvent.Invoke();
     }
 
     void OnConfirm()
     {
         if (canNavigate)
-            activeNavItem.gameObject.SendMessage("OnConfirm", SendMessageOptions.DontRequireReceiver);
+            currentNavItem.gameObject.SendMessage("OnConfirm", SendMessageOptions.DontRequireReceiver);
     }
 
     #endregion
 
     public void SetNavItemActive(NavItem newNavItem)
     {
-        activeNavItem.gameObject.SendMessage("OnUnhover", SendMessageOptions.DontRequireReceiver);
-        activeNavItem = newNavItem;
+        currentNavItem.gameObject.SendMessage("OnUnhover", SendMessageOptions.DontRequireReceiver);
+        currentNavItem = newNavItem;
         newNavItem.gameObject.SendMessage("OnHover", SendMessageOptions.DontRequireReceiver);
-    }
-
-    public void GoToSettings()
-    {
-        
-        StartCoroutine(MoveCameraToPosition(settingsPos.position, settingsNavItem));
     }
 
     public void GoToTitle()
     {
-        StartCoroutine(MoveCameraToPosition(titlePos.position, titleNavItem));
+        GoToRoom(titleRoom, titleNavItem);
     }
 
-    public void GoToLevelSelect()
+    public void GoToSettings()
     {
-        StartCoroutine(MoveCameraToPosition(levelSelectPos.position, worldNavItems[GameData.instance.currentWorld - 1]));
+        GoToRoom(settingsRoom, settingsNavItem);
     }
 
-    IEnumerator MoveCameraToPosition(Vector3 targetPosition, NavItem newNavItem)
+    public void GoToWorld(int world)
     {
-        // unhover current nav item
-        activeNavItem.gameObject.SendMessage("OnUnhover", SendMessageOptions.DontRequireReceiver);
-        //disable nav
+        GameData.instance.currentWorld = world;
+        GoToRoom(worldRooms[world -1], worldNavItems[world - 1]);
+    }
+
+    private void GoToRoom(Room room, NavItem navItem)
+    {
+        if (swipingCamera)
+            StopCoroutine(camSwipeRoutine);
+        camSwipeRoutine = StartCoroutine(MoveToRoom(room, navItem));
+    }
+
+    IEnumerator MoveToRoom(Room targetRoom, NavItem targetNavItem)
+    {
+        swipingCamera = true;
         canNavigate = false;
-        // move camera
-        camMovement.GoToPosition(targetPosition, camSwipeDuration);
-        yield return new WaitForSeconds(camSwipeDuration);
-        // when done, renable nav
-        canNavigate = true;
-        // set new current nav and hover it
-        activeNavItem = newNavItem;
-        activeNavItem.gameObject.SendMessage("OnHover", SendMessageOptions.DontRequireReceiver);
-    }
+        // tell current NavItem it is no longer hovered
+        currentNavItem.gameObject.SendMessage("OnUnhover", SendMessageOptions.DontRequireReceiver);
 
-    public void GoToWorld(int targetWorld)
-    {
-        GameData.instance.currentWorld = targetWorld;
-        StartCoroutine(MoveWorldSelect(targetWorld));
-    }
-
-    IEnumerator MoveWorldSelect(int targetWorld)
-    {
-        //unhover current NavItem
-        activeNavItem.gameObject.SendMessage("OnUnhover", SendMessageOptions.DontRequireReceiver);
-        //disable nav
-        canNavigate = false;
-
-        // swipe world ("camera")
-        Vector3 startPosition = levelSelect.transform.position;
-        Vector3 targetPosition = new Vector3((targetWorld - 1) * -(roomWidth + roomPadding), levelSelect.transform.position.y, 0);
-        float duration = camSwipeDuration;
-
+        // get some refs
         float timer = 0;
+        float duration = camSwipeDuration;
+        Camera cam = Camera.main;
+        Vector3 startPos = new Vector3(currentRoom.transform.position.x, currentRoom.transform.position.y, -10);
+        Vector3 targetPos = new Vector3(targetRoom.transform.position.x, targetRoom.transform.position.y, -10);
+
         while (timer < duration)
         {
             timer += Time.deltaTime;
 
+            // swipe camera to room
             float prc = timer / duration;
-            levelSelect.transform.position = Vector3.Lerp(startPosition, targetPosition, worldSelectSwipeCurve.Evaluate(prc));
+            cam.transform.position = Vector3.Lerp(startPos, targetPos, camSwipeCurve.Evaluate(prc));
+            
+
+            // enable navigation before finishing the camera movement
+            if (timer > camSwipeNavDisableDuration && !canNavigate)
+            {
+                canNavigate = true;
+                currentRoom = targetRoom;
+                currentNavItem = targetNavItem;
+            }
 
             yield return null;
         }
 
-        // when done, renable nav
-        canNavigate = true;
-        // set new current nav and hover over it
-        activeNavItem = worldNavItems[targetWorld - 1];
-        activeNavItem.gameObject.SendMessage("OnHover", SendMessageOptions.DontRequireReceiver);
+        swipingCamera = false;
+        // when done with the camera swipe, tell current Navitem it is hovered
+        currentNavItem.gameObject.SendMessage("OnHover", SendMessageOptions.DontRequireReceiver);
     }
+
+    #region Scene Management And Transitions
+
+    IEnumerator TransitionIn()
+    {
+        canNavigate = false;
+        currentNavItem.gameObject.SendMessage("OnUnhover", SendMessageOptions.DontRequireReceiver);
+        // do transition
+        transition.StartTransitionIn();
+        yield return new WaitForSeconds(transition.transitionClip.length);
+        // enable navigation
+        canNavigate = true;
+        currentNavItem.gameObject.SendMessage("OnHover", SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void QuitGame()
+    {
+        StartCoroutine(TransitionToQuit());
+    }
+
+    IEnumerator TransitionToQuit()
+    {
+        canNavigate = false;
+        currentNavItem.gameObject.SendMessage("OnUnhover", SendMessageOptions.DontRequireReceiver);
+        // do transition
+        transition.StartTransitionOut();
+        yield return new WaitForSeconds(transition.transitionClip.length);
+        // quit game
+        yield return new WaitForSeconds(0.5f);
+        Application.Quit();
+        Debug.Log("Game Quit");
+    }
+
+    public void GoToLevel(int world, int level)
+    {
+        GameData.instance.currentWorld = world;
+        GameData.instance.levelToLoad = level;
+        StartCoroutine(TransitionToLevel());
+    }
+
+    IEnumerator TransitionToLevel()
+    {
+        canNavigate = false;
+        // do transition
+        transition.StartTransitionOut();
+        yield return new WaitForSeconds(transition.transitionClip.length);
+        // go to scene
+        SceneManager.LoadScene("Test Level 2");
+    }
+
+    #endregion
 }

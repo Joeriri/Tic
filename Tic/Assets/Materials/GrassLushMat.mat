@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BWMat
+  m_Name: GrassLushMat
   m_Shader: {fileID: -6465566751694194690, guid: e25f5a7063c3402448787d1c530d86cc,
     type: 3}
   m_ShaderKeywords: ETC1_EXTERNAL_ALPHA
@@ -72,14 +72,14 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - Color_92CFAD95: {r: 1, g: 1, b: 1, a: 0}
-    - Color_E5A34C75: {r: 0, g: 0, b: 0, a: 0}
+    - Color_92CFAD95: {r: 0.24313727, g: 0.5372549, b: 0.28235295, a: 0}
+    - Color_E5A34C75: {r: 0.38823533, g: 0.7803922, b: 0.3019608, a: 0}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _BlackColor: {r: 0, g: 0, b: 0, a: 1}
+    - _BlackColor: {r: 0.38823533, g: 0.7803922, b: 0.3019608, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-    - _WhiteColor: {r: 1, g: 1, b: 1, a: 1}
+    - _WhiteColor: {r: 0.24313727, g: 0.5372549, b: 0.28235295, a: 1}
 --- !u!114 &7573207220517247653
 MonoBehaviour:
   m_ObjectHideFlags: 11

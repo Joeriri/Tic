@@ -5725,6 +5725,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c718f848739423842992815c5bf76d63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundMap: {fileID: 8406511}
   wallMap: {fileID: 842060934}
   wallTile: {fileID: 11400000, guid: 2a69bce24abd93d4d9336ffe9b120ee0, type: 2}
   playerPrefab: {fileID: 9222177577076290909, guid: a9090f6aa499ba945930b41f089b6b9f,
@@ -5733,6 +5734,14 @@ MonoBehaviour:
     type: 3}
   levelSize: {x: 9, y: 9}
   levelOrigin: {x: -5, y: -5}
+  wallMaterials:
+  - {fileID: 2100000, guid: 8a5f4a377afb0b64ea976106c7764880, type: 2}
+  - {fileID: 2100000, guid: 7420eb2cc011c5a43a0201e8c7b8940e, type: 2}
+  - {fileID: 2100000, guid: 57012b063c3ef7849920b715ac27274b, type: 2}
+  floorMaterials:
+  - {fileID: 2100000, guid: 1a20d65917f26d544ade77376297e23b, type: 2}
+  - {fileID: 2100000, guid: e4678437748d8ea4997ce187ba8d6994, type: 2}
+  - {fileID: 2100000, guid: eadf61de85a37724d8cdcaefaaa637e7, type: 2}
 --- !u!1001 &2868682229033125172
 PrefabInstance:
   m_ObjectHideFlags: 0
