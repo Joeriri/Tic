@@ -44,6 +44,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "Back",
+                    "type": "Button",
+                    "id": "69488eac-8737-48b1-a467-5f68d774d07e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -51,6 +59,28 @@
                     "name": "",
                     "id": "0d901a2f-ba24-4a4d-9215-3a6896e3d3a0",
                     "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Left",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "100e9eef-f775-4d72-a6d1-73ad44289786",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Left",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ac33d8c1-6dab-496d-b923-04e8521a0b05",
+                    "path": "<Keyboard>/j",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -64,6 +94,28 @@
                     "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Right",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0bc79cf1-c967-4361-9d57-42bf696f400d",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Right",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0ef82df3-18b0-41a4-a262-63b870c4f481",
+                    "path": "<Keyboard>/l",
+                    "interactions": "",
+                    "processors": "",
                     "groups": "",
                     "action": "Right",
                     "isComposite": false,
@@ -73,6 +125,28 @@
                     "name": "",
                     "id": "acd5a2ed-4dc7-40fd-860a-92e948333917",
                     "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Up",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a5af24ee-94ea-42b6-ab9e-dc0006595a0a",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Up",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3d599a33-0725-4a29-96f0-d5366a7318d0",
+                    "path": "<Keyboard>/i",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -86,6 +160,28 @@
                     "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Down",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "18cc01d9-5476-4a11-90eb-628a25e5246d",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Down",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c37162ed-8cf9-4414-8629-6520d067a2b5",
+                    "path": "<Keyboard>/k",
+                    "interactions": "",
+                    "processors": "",
                     "groups": "",
                     "action": "Down",
                     "isComposite": false,
@@ -97,8 +193,41 @@
                     "path": "<Keyboard>/enter",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Keyboard",
                     "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ee3df168-4507-4e25-a845-dad5d9c3c103",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "81c4b8b0-a1ad-4101-ae0a-45a5de05c2df",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Back",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "aaec4c10-ec1c-4101-a444-0aba4ebc44e1",
+                    "path": "<Keyboard>/backspace",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Back",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -86,6 +86,24 @@ public class NavManager : MonoBehaviour
             currentNavItem.gameObject.SendMessage("OnConfirm", SendMessageOptions.DontRequireReceiver);
     }
 
+    void OnBack()
+    {
+        if (canNavigate)
+        {
+            // if not on title, go to title
+            if (currentNavItem != titleNavItem)
+            {
+                GoToTitle();
+            }
+            // if on title, quit game
+            else
+            {
+                QuitGame();
+            }
+        }
+        
+    }
+
     #endregion
 
     public void SetNavItemActive(NavItem newNavItem)
@@ -129,7 +147,7 @@ public class NavManager : MonoBehaviour
         float timer = 0;
         float duration = camSwipeDuration;
         Camera cam = Camera.main;
-        Vector3 startPos = new Vector3(currentRoom.transform.position.x, currentRoom.transform.position.y, -10);
+        Vector3 startPos = cam.transform.position;
         Vector3 targetPos = new Vector3(targetRoom.transform.position.x, targetRoom.transform.position.y, -10);
 
         while (timer < duration)
@@ -151,6 +169,7 @@ public class NavManager : MonoBehaviour
 
             yield return null;
         }
+        cam.transform.position = targetPos;
 
         swipingCamera = false;
         // when done with the camera swipe, tell current Navitem it is hovered
@@ -184,7 +203,7 @@ public class NavManager : MonoBehaviour
         transition.StartTransitionOut();
         yield return new WaitForSeconds(transition.transitionClip.length);
         // quit game
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.2f);
         Application.Quit();
         Debug.Log("Game Quit");
     }
@@ -203,6 +222,7 @@ public class NavManager : MonoBehaviour
         transition.StartTransitionOut();
         yield return new WaitForSeconds(transition.transitionClip.length);
         // go to scene
+        yield return new WaitForSeconds(0.2f);
         SceneManager.LoadScene("Test Level 2");
     }
 
