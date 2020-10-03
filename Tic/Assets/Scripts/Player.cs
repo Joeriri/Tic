@@ -18,6 +18,9 @@ public class Player : MonoBehaviour
     [Header("Animation")]
     public Sprite activeSprite;
     public Sprite inActiveSprite;
+    [SerializeField] private float squashFactor = 0.25f;
+    [SerializeField] private float squashDuration = 0.1f;
+    private Coroutine squashRoutine;
 
     private float life;
     private float maxLife;
@@ -42,7 +45,7 @@ public class Player : MonoBehaviour
         tileGrid = FindObjectOfType<Grid>();
         kb = InputSystem.GetDevice<Keyboard>();
         levelUI = FindObjectOfType<LevelUI>();
-        spriteR = GetComponent<SpriteRenderer>();
+        spriteR = GetComponentInChildren<SpriteRenderer>();
     }
 
     // Start is called before the first frame update
@@ -54,26 +57,43 @@ public class Player : MonoBehaviour
         maxLife = startLife + GameData.instance.extraTime;
         life = maxLife;
 
-        RestartPlayer();
+        ResetPlayer();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!wonLevel && !ignoreInput)
-        {
-            //            WASD                           IJKL                           Arrows
-            bool left   = kb.aKey.wasPressedThisFrame || kb.jKey.wasPressedThisFrame || kb.leftArrowKey.wasPressedThisFrame;
-            bool right  = kb.dKey.wasPressedThisFrame || kb.lKey.wasPressedThisFrame || kb.rightArrowKey.wasPressedThisFrame;
-            bool up     = kb.wKey.wasPressedThisFrame || kb.iKey.wasPressedThisFrame || kb.upArrowKey.wasPressedThisFrame;
-            bool down   = kb.sKey.wasPressedThisFrame || kb.kKey.wasPressedThisFrame || kb.downArrowKey.wasPressedThisFrame;
 
-            if (left)   MovePlayer(Vector2.left);
-            if (right)  MovePlayer(Vector2.right);
-            if (up)     MovePlayer(Vector2.up);
-            if (down)   MovePlayer(Vector2.down);
-        }
     }
+
+    #region Input
+
+    void OnLeft()
+    {
+        if (!ignoreInput) MovePlayer(Vector2.left);
+    }
+
+    void OnRight()
+    {
+        if (!ignoreInput) MovePlayer(Vector2.right);
+    }
+
+    void OnUp()
+    {
+        if (!ignoreInput) MovePlayer(Vector2.up);
+    }
+
+    void OnDown()
+    {
+        if (!ignoreInput) MovePlayer(Vector2.down);
+    }
+
+    void OnBack()
+    {
+        GameManager.Instance.ReturnToMenu();
+    }
+
+    #endregion
 
     void MovePlayer(Vector2 moveDirection)
     {
@@ -86,13 +106,18 @@ public class Player : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(transform.position, moveDirection, Mathf.Infinity, wallLayer);
         if (hit)
         {
+            Vector2 oldPosition = transform.position;
             Vector2 newPosition = hit.point - new Vector2(moveDirection.x * tileGrid.cellSize.x * 0.5f, moveDirection.y * tileGrid.cellSize.y * 0.5f);
 
             // check if we actually moved
-            if ((Vector2)transform.position != newPosition)
+            if (oldPosition != newPosition)
             {
                 // move
                 transform.position = newPosition;
+
+                // Do squash animation
+                StopSquashAnimation();
+                squashRoutine = StartCoroutine(SquashAnimation(moveDirection));
 
                 // make sound
                 hitCount++;
@@ -115,17 +140,18 @@ public class Player : MonoBehaviour
         while (life > 0f)
         {
             life -= Time.deltaTime;
-            levelUI.SetHealthBarValue(life / maxLife);
-            levelUI.SetTimerText(life);
+            //levelUI.SetHealthBarValue(life / maxLife);
+            //levelUI.SetTimerText(life);
             yield return null;
         }
-
-        // make sure we always end with exactly 0 life.
         life = 0f;
-        levelUI.SetHealthBarValue(life / maxLife);
-        levelUI.SetTimerText(life);
 
-        RestartPlayer();
+        //// make sure we always end with exactly 0 life.
+        //life = 0f;
+        //levelUI.SetHealthBarValue(life / maxLife);
+        //levelUI.SetTimerText(life);
+
+        ResetPlayer();
 
         // play tick sound
         float randomPitch = Random.Range(0.8f, 1.2f);
@@ -134,40 +160,42 @@ public class Player : MonoBehaviour
 
     IEnumerator RefillLife()
     {
+        spriteR.sprite = inActiveSprite;
+        ignoreInput = true;
+
         while (life < maxLife)
         {
             life += Time.deltaTime / refillDuration;
-            levelUI.SetHealthBarValue(Mathf.Sin(life / maxLife * Mathf.PI * 0.5f));
-            levelUI.SetTimerText(life);
+            //levelUI.SetHealthBarValue(Mathf.Sin(life / maxLife * Mathf.PI * 0.5f));
+            //levelUI.SetTimerText(life);
             yield return null;
         }
 
         // make sure we always end with exactly max life.
         life = maxLife;
-        levelUI.SetHealthBarValue(life / maxLife);
-        levelUI.SetTimerText(life);
+        //levelUI.SetHealthBarValue(life / maxLife);
+        //levelUI.SetTimerText(life);
 
         spriteR.sprite = activeSprite;
         ignoreInput = false;
     }
 
-    public void RestartPlayer()
+    public void ResetPlayer()
     {
         // reset player
         transform.position = startPos;
         madeFirstMove = false;
         hitCount = 0;
-        // ignore input until life is refilled. RefillLife routine sets ignoreInput true
-        spriteR.sprite = inActiveSprite;
-        ignoreInput = true;
+        StopSquashAnimation();
         StartCoroutine(RefillLife());
 
-        Debug.Log("Player died");
+        Debug.Log("Resetting Player");
     }
 
     public void WinLevel()
     {
         wonLevel = true;
+        ignoreInput = true;
 
         // When life is below 0 here the player won during the last execution of the lifeTimer coroutine, but before the routine reached RestartPlayer. Insane!
         if (life < 0)
@@ -179,8 +207,10 @@ public class Player : MonoBehaviour
 
         StopCoroutine(lifeTimer);
         Debug.Log(life);
+
         levelUI.ShowWinScreen();
         levelUI.SetTotalTimeText(maxLife - life, maxLife);
+        //GameManager.Instance.LevelWon();
 
         // make happy sound
         //string randomImpactSound = "win_" + Random.Range(1, 4).ToString();
@@ -189,5 +219,44 @@ public class Player : MonoBehaviour
         AudioManager.instance.PlayWithPitch("win", randomPitch);
 
         Debug.Log("Player won!");
+    }
+
+    IEnumerator SquashAnimation(Vector2 direction)
+    {
+        // some vars
+        float duration = squashDuration;
+        float timer = 0;
+
+        // squash player
+        Vector2 squashVector = Vector2.one;
+        if (direction.y == 0) squashVector = new Vector2(-1, 1); // horizontal squash
+        if (direction.x == 0) squashVector = new Vector2(1, -1); // vertical squash
+        Vector2 squashScale = Vector2.one + squashVector * squashFactor;
+        spriteR.transform.localScale = squashScale;
+        Vector2 squashPosition = Vector2.zero + direction * squashFactor * 0.5f;
+        spriteR.transform.localPosition = squashPosition;
+
+        // squash back animation
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            float prc = timer / duration;
+
+            spriteR.transform.localPosition = Vector2.Lerp(squashPosition, Vector2.zero, prc);
+            spriteR.transform.localScale = Vector2.Lerp(squashScale, Vector2.one, prc);
+
+            yield return null;
+        }
+
+        //reset
+        spriteR.transform.localPosition = Vector2.zero;
+        spriteR.transform.localScale = Vector2.one;
+    }
+
+    void StopSquashAnimation()
+    {
+        if (squashRoutine != null) StopCoroutine(squashRoutine);
+        spriteR.transform.localPosition = Vector2.zero;
+        spriteR.transform.localScale = Vector2.one;
     }
 }

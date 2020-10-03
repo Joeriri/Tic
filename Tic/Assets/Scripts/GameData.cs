@@ -27,4 +27,5 @@ public class GameData
     public float audioVolumeSetting = 1.0f;
     public int levelToLoad = 7;
     public int currentWorld = 1;
+    public bool firstBoot = true;
 }

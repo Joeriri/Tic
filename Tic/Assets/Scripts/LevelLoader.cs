@@ -15,8 +15,11 @@ public class LevelLoader : MonoBehaviour
     public GameObject goalPrefab;
 
     [Header("Level Information")]
-    [SerializeField] private Vector2Int levelSize = new Vector2Int(9,9);
-    [SerializeField] private Vector2Int levelOrigin = new Vector2Int(-5, -5);
+    public int worldNumber = 1;
+    public int levelnumber = 1;
+    public bool loadCustomLevel = false;
+    private Vector2Int levelSize = new Vector2Int(9,9);
+    private Vector2Int levelOrigin = new Vector2Int(-5, -5);
 
     [Header("World Colors")]
     public Material[] wallMaterials;
@@ -30,7 +33,19 @@ public class LevelLoader : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        LoadLevel(GameData.instance.currentWorld, GameData.instance.levelToLoad);
+        if (GameData.instance.firstBoot)
+        {
+            PlayerPrefs.SetInt("currentWorld", worldNumber);
+            PlayerPrefs.SetInt("currentLevel", levelnumber);
+            GameData.instance.firstBoot = false;
+        }
+        else
+        {
+            worldNumber = PlayerPrefs.GetInt("currentWorld");
+            levelnumber = PlayerPrefs.GetInt("currentLevel");
+        }
+        
+        LoadLevel(worldNumber, levelnumber);
     }
 
     // Update is called once per frame

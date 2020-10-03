@@ -79,7 +79,7 @@ public class LevelUI : MonoBehaviour
 
     public void GoToNextLevel()
     {
-        SceneManager.LoadScene("Level_" + (levelNumber + 1).ToString());
+        GameManager.Instance.LoadNextLevel();
     }
 
     IEnumerator ShowButtonsRoutine()

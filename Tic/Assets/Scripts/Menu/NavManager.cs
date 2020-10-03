@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 public class NavManager : MonoBehaviour
 {
     public NavItem currentNavItem;
-    public Room currentRoom;
 
     [Header("Scene Transition")]
     public Transition transition;
@@ -21,12 +20,7 @@ public class NavManager : MonoBehaviour
     public NavItem settingsNavItem;
     public NavItem titleNavItem;
     public NavItem[] worldNavItems;
-
-    [Header("Rooms")]
-    public Room titleRoom;
-    public Room settingsRoom;
-    public Room[] worldRooms;
-
+    
     [Header("World Selection")]
     public int roomWidth = 23;
     public int roomPadding = 3;
@@ -106,6 +100,16 @@ public class NavManager : MonoBehaviour
 
     #endregion
 
+    public void GoToTitle()
+    {
+
+    }
+
+    public void GoToSettings()
+    {
+
+    }
+
     public void SetNavItemActive(NavItem newNavItem)
     {
         currentNavItem.gameObject.SendMessage("OnUnhover", SendMessageOptions.DontRequireReceiver);
@@ -113,69 +117,11 @@ public class NavManager : MonoBehaviour
         newNavItem.gameObject.SendMessage("OnHover", SendMessageOptions.DontRequireReceiver);
     }
 
-    public void GoToTitle()
-    {
-        GoToRoom(titleRoom, titleNavItem);
-    }
-
-    public void GoToSettings()
-    {
-        GoToRoom(settingsRoom, settingsNavItem);
-    }
-
     public void GoToWorld(int world)
     {
         GameData.instance.currentWorld = world;
-        GoToRoom(worldRooms[world -1], worldNavItems[world - 1]);
     }
-
-    private void GoToRoom(Room room, NavItem navItem)
-    {
-        if (swipingCamera)
-            StopCoroutine(camSwipeRoutine);
-        camSwipeRoutine = StartCoroutine(MoveToRoom(room, navItem));
-    }
-
-    IEnumerator MoveToRoom(Room targetRoom, NavItem targetNavItem)
-    {
-        swipingCamera = true;
-        canNavigate = false;
-        // tell current NavItem it is no longer hovered
-        currentNavItem.gameObject.SendMessage("OnUnhover", SendMessageOptions.DontRequireReceiver);
-
-        // get some refs
-        float timer = 0;
-        float duration = camSwipeDuration;
-        Camera cam = Camera.main;
-        Vector3 startPos = cam.transform.position;
-        Vector3 targetPos = new Vector3(targetRoom.transform.position.x, targetRoom.transform.position.y, -10);
-
-        while (timer < duration)
-        {
-            timer += Time.deltaTime;
-
-            // swipe camera to room
-            float prc = timer / duration;
-            cam.transform.position = Vector3.Lerp(startPos, targetPos, camSwipeCurve.Evaluate(prc));
-            
-
-            // enable navigation before finishing the camera movement
-            if (timer > camSwipeNavDisableDuration && !canNavigate)
-            {
-                canNavigate = true;
-                currentRoom = targetRoom;
-                currentNavItem = targetNavItem;
-            }
-
-            yield return null;
-        }
-        cam.transform.position = targetPos;
-
-        swipingCamera = false;
-        // when done with the camera swipe, tell current Navitem it is hovered
-        currentNavItem.gameObject.SendMessage("OnHover", SendMessageOptions.DontRequireReceiver);
-    }
-
+    
     #region Scene Management And Transitions
 
     IEnumerator TransitionIn()
@@ -227,4 +173,82 @@ public class NavManager : MonoBehaviour
     }
 
     #endregion
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    public void MoveToNavItem(NavItem targetNavItem)
+    {
+        currentNavItem.gameObject.SendMessage("OnDeactivated", SendMessageOptions.DontRequireReceiver);
+        
+        if (targetNavItem.room == currentNavItem.room)
+        {
+            // if nav item is in same room
+            currentNavItem = targetNavItem;
+            currentNavItem.gameObject.SendMessage("OnActivated", SendMessageOptions.DontRequireReceiver);
+        }
+        else
+        {
+            // if nav item is in another oom
+            currentNavItem.room.SendMessage("OnLeaveRoom", SendMessageOptions.DontRequireReceiver);
+            currentNavItem = targetNavItem;
+            MoveToRoom(targetNavItem.room, targetNavItem);
+        }
+    }
+
+    public void MoveToRoom(Room targetRoom, NavItem newNavItem)
+    {
+        if (swipingCamera)
+            StopCoroutine(camSwipeRoutine);
+        camSwipeRoutine = StartCoroutine(MoveToRoomRoutine(targetRoom, newNavItem));
+    }
+
+    IEnumerator MoveToRoomRoutine(Room targetRoom, NavItem newNavItem)
+    {
+        swipingCamera = true;
+        canNavigate = false;
+        
+        // get some refs
+        float timer = 0;
+        float duration = camSwipeDuration;
+        Camera cam = Camera.main;
+        Vector3 startPos = cam.transform.position;
+        Vector3 targetPos = new Vector3(targetRoom.transform.position.x, targetRoom.transform.position.y, -10);
+
+        // routine
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+
+            // swipe camera to room
+            float prc = timer / duration;
+            cam.transform.position = Vector3.Lerp(startPos, targetPos, camSwipeCurve.Evaluate(prc));
+
+            //// enable navigation before finishing the camera movement
+            //if (timer > camSwipeNavDisableDuration && !canNavigate)
+            //{
+            //    canNavigate = true;
+            //}
+
+            yield return null;
+        }
+        cam.transform.position = targetPos;
+
+        swipingCamera = false;
+        canNavigate = true;
+
+        currentNavItem.room.SendMessage("OnEnterRoom", SendMessageOptions.DontRequireReceiver);
+        currentNavItem.gameObject.SendMessage("OnActivated", SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void SetCurrentNavItem(NavItem newNavItem)
+    {
+        currentNavItem = newNavItem;
+    }
+
+    void FinishIntro()
+    {
+        canNavigate = true;
+        currentNavItem.SendMessage("OnActivated");
+        currentNavItem.room.SendMessage("OnEnterRoom");
+    }
 }

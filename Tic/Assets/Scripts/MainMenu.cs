@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    [SerializeField] private Transform SettingsRoom;
+
     // Start is called before the first frame update
     void Start()
     {
