@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3580509967473021520
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3580509967473021522}
+  - component: {fileID: 3580509967473021523}
+  - component: {fileID: 3580509967473021525}
+  m_Layer: 0
+  m_Name: Recolorer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3580509967473021522
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3580509967473021520}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.6426511, y: -0.14167684, z: -5.0664062}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3580509967473021523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3580509967473021520}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4a035a56dbb5a44d9d644caf4e75559, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundTilemapR: {fileID: 0}
+  startColor: {r: 0.38823533, g: 0.7803922, b: 0.3019608, a: 0}
+  targetColor: {r: 0.8018868, g: 0.34046495, b: 0.2004717, a: 0}
+--- !u!114 &3580509967473021525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3580509967473021520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e703b479b0518d43ac4acf603252461, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundTilemapR: {fileID: 0}
+  wallTilemapR: {fileID: 0}
+  worldColorProfiles:
+  - {fileID: 11400000, guid: 34ef5e3972a0a8f46bb054f2c25ecd40, type: 2}
+  - {fileID: 11400000, guid: 0a37b8c1bf2d4474584f149da74ef960, type: 2}
+  - {fileID: 11400000, guid: 3071d9bab3369334e8f2af5caa23e276, type: 2}

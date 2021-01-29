@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     Grid tileGrid;
     LevelLoader levelLoader;
     LevelUI levelUI;
+    FadeTransition transition;
 
     public static GameManager Instance;
 
@@ -18,12 +19,13 @@ public class GameManager : MonoBehaviour
         tileGrid = FindObjectOfType<Grid>();
         levelLoader = FindObjectOfType<LevelLoader>();
         levelUI = FindObjectOfType<LevelUI>();
+        transition = FindObjectOfType<FadeTransition>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        //StartCoroutine(FadeIn());
     }
 
     // Update is called once per frame
@@ -63,5 +65,19 @@ public class GameManager : MonoBehaviour
     public void ReturnToMenu()
     {
 
+    }
+
+    IEnumerator FadeIn()
+    {
+        // fade in
+        transition.FadeIn();
+        yield return new WaitForSeconds(transition.transitionClip.length);
+    }
+
+    IEnumerator FadeOut()
+    {
+        // fade out
+        transition.FadeOut();
+        yield return new WaitForSeconds(transition.transitionClip.length);
     }
 }

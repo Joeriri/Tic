@@ -4,21 +4,24 @@ using UnityEngine;
 
 public class Room : MonoBehaviour
 {
-    public GameObject hoverObjects;
+    [Header("Level Selection")]
+    public bool isLevelWorld = false;
+    public int worldNumber;
 
-    void OnEnterRoom()
+    Recolorer worldColor;
+
+    private void Awake()
     {
-        if (hoverObjects != null)
+        worldColor = FindObjectOfType<Recolorer>();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.gameObject.tag == "MainCamera" && isLevelWorld)
         {
-            hoverObjects.SetActive(true);
+            worldColor.StartWorldRecolor(worldColor.worldColorProfiles[worldNumber - 1]);
         }
     }
 
-    void OnLeaveRoom()
-    {
-        if (hoverObjects != null)
-        {
-            hoverObjects.SetActive(false);
-        }
-    }
+    
 }

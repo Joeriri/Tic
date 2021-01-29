@@ -26,7 +26,7 @@ public class Player : MonoBehaviour
     private float maxLife;
     private float startLife = 1.0f;
 
-    private bool ignoreInput = false;
+     public bool ignoreInput = false;
     bool madeFirstMove = false;
     bool wonLevel = false;
     private Vector2 startPos;

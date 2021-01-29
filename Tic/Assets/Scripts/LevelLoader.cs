@@ -21,18 +21,12 @@ public class LevelLoader : MonoBehaviour
     private Vector2Int levelSize = new Vector2Int(9,9);
     private Vector2Int levelOrigin = new Vector2Int(-5, -5);
 
-    [Header("World Colors")]
-    public Material[] wallMaterials;
-    public Material[] floorMaterials;
+    Recolorer worldColor;
 
     private void Awake()
     {
+        worldColor = FindObjectOfType<Recolorer>();
 
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
         if (GameData.instance.firstBoot)
         {
             PlayerPrefs.SetInt("currentWorld", worldNumber);
@@ -44,8 +38,14 @@ public class LevelLoader : MonoBehaviour
             worldNumber = PlayerPrefs.GetInt("currentWorld");
             levelnumber = PlayerPrefs.GetInt("currentLevel");
         }
-        
+
         LoadLevel(worldNumber, levelnumber);
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
     }
 
     // Update is called once per frame
@@ -87,9 +87,8 @@ public class LevelLoader : MonoBehaviour
 
         }
 
-        // assign materials
-        groundMap.GetComponent<TilemapRenderer>().material = floorMaterials[worldNumber - 1];
-        wallMap.GetComponent<TilemapRenderer>().material = wallMaterials[worldNumber - 1];
+        // set world palette
+        worldColor.SetWorldColors(worldColor.worldColorProfiles[worldNumber - 1]);
 
         Debug.Log("Loaded World " + worldNumber.ToString() + " Level " + levelNumber.ToString() + ".");
     }
